@@ -1,0 +1,1 @@
+Python script that read a covid data .csv file from "https://covid.ourworldindata.org/data/owid-covid-data.csv", stores it in a pandas dataframe and update a PostgreSQL database available remotely.
