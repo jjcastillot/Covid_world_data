@@ -1,18 +1,32 @@
 import pandas as pd
 import psycopg2
+from datetime import datetime,timedelta
 from psycopg2 import sql
-from .creds import my_host, my_database, my_user, my_password
+from creds import my_host, my_database, my_user, my_password
 
 # Read the CSV file from the URL
 url = "https://covid.ourworldindata.org/data/owid-covid-data.csv"
 df = pd.read_csv(url)
+
+# Reads the last updated date from the TXT file
+with open('last_date_updated.txt', 'r') as f:
+    last_date_str = f.read().strip()
+    last_date = datetime.strptime(last_date_str, '%Y-%m-%d')
+
+# Takes into account just the rows since the last update
+df = df[df['date'].apply(pd.to_datetime) > last_date]
+most_recent_date = df['date'].max()
+
+# Updates the TXT file
+with open('last_date_updated.txt', 'w') as f:
+    f.write(most_recent_date)
 
 # Create a PostgreSQL connection
 conn = psycopg2.connect(host=my_host, database=my_database, user=my_user, password=my_password)
 
 # Create a table in the database
 cur = conn.cursor()
-cur.execute("DROP TABLE IF EXISTS covid_data;")
+#cur.execute("DROP TABLE IF EXISTS covid_data;")
 
 table_create = '''
     CREATE TABLE IF NOT EXISTS covid_data (
