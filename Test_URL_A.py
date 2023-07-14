@@ -11,10 +11,13 @@ df = pd.read_csv(url)
 # Reads the last updated date from the TXT file
 with open('last_date_updated.txt', 'r') as f:
     last_date_str = f.read().strip()
-    last_date = datetime.strptime(last_date_str, '%Y-%m-%d')
+    # Decreases the last date by 2 days, to overwrite this time's data, 
+    # because sometimes it's not updated when readed
+    last_date = datetime.strptime(last_date_str, '%Y-%m-%d') - timedelta(days=2)
+    last_date_str = last_date.strftime('%Y-%m-%d') #Transforms to string
 
 # Takes into account just the rows since the last update
-df = df[df['date'].apply(pd.to_datetime) > last_date]
+df = df[df['date'].apply(pd.to_datetime) >= last_date]
 most_recent_date = df['date'].max()
 
 # Updates the TXT file
@@ -99,7 +102,10 @@ table_create = '''
         excess_mortality_cumulative_per_million FLOAT
     )
 '''
+row_deletion = f"DELETE FROM covid_data WHERE date >= '{last_date_str}'"
+
 cur.execute(table_create)
+cur.execute(row_deletion)
 
 i=0
 # Insert the data into the table
