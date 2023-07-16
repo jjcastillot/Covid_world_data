@@ -11,9 +11,9 @@ df = pd.read_csv(url)
 # Reads the last updated date from the TXT file
 with open('last_date_updated.txt', 'r') as f:
     last_date_str = f.read().strip()
-    # Decreases the last date by 2 days, to overwrite this time's data, 
-    # because sometimes it's not updated when readed
-    last_date = datetime.strptime(last_date_str, '%Y-%m-%d') - timedelta(days=2)
+    # Decreases the last date by 6 days, to overwrite this time's data, 
+    # because sometimes it's not up to date when readed
+    last_date = datetime.strptime(last_date_str, '%Y-%m-%d') - timedelta(days=6)
     last_date_str = last_date.strftime('%Y-%m-%d') #Transforms to string
 
 # Takes into account just the rows since the last update
